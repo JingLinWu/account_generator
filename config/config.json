@@ -1,0 +1,8 @@
+{"cognito":
+	{
+	"cognito_domain":"", 
+	"region": "",
+	"client_id":"",
+	"redirect_uri":"https://www.example.com"
+	}
+}

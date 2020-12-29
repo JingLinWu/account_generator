@@ -1,0 +1,26 @@
+{
+  "name": "magic_account",
+  "version": "1.0.7",
+  "description": "Generate account and signup for specified services",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinglinwu/magic_account.git"
+  },
+  "keywords": [
+    "account"
+  ],
+  "author": "jinglin wu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jinglinwu/magic_account/issues"
+  },
+  "homepage": "https://github.com/jinglinwu/magic_account#readme",
+  "dependencies": {
+    "jsdom": "^16.4.0",
+    "request": "^2.88.2"
+  }
+}
