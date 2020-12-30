@@ -15,15 +15,14 @@ Object.freeze(Constants.LEVEL);
 class Logger {
 
 	levelMap = { "debug":0, "info":1, "warn":2, "error":3} 
-
 	constructor(){
+		//ES6 singleton
 		this.level = Constants.LEVEL.INFO;
-		if( Logger.instance instanceof Logger) {
-			return Logger.instance;
-		}else{
-			Logger.instance = this;
-			return Logger.instance;
+		const instance = this.constructor.instance;
+		if ( instance) {
+			return instance;
 		}
+		this.constructor.instance = this;
 	}
 	setLogLevel ( lev ) {
 		this.level = lev; 

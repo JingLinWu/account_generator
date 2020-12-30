@@ -1,19 +1,17 @@
-<h1 align="center">Welcome to magic_account 👋</h1>
+<h1 align="center">Welcome to magic-account 👋</h1>
 <p>
-  <a href="https://www.npmjs.com/package/magic_account" target="_blank">
-    <img alt="Version" src="https://img.shields.io/npm/v/magic_account.svg">
-  </a>
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.8-blue.svg?cacheSeconds=2592000" />
   <a href="#" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
 </p>
 
-> Provder account generator for the services
+> Provide the convenient way to generate account with signned-up service
+
 
 ## Usage
 
 ```sh
-
 var acc = require('magic_account');
 
 var SecMail = acc.SecMail
@@ -43,14 +41,13 @@ m.addServiceProvider(cognito);
 
 m.generateAccountInfo();
 
-
 ```
-
 
 ## Author
 
 👤 **jinglinwu**
 
+* Website: https://jinglinwu.medium.com/
 * Github: [@jinglinwu](https://github.com/jinglinwu)
 
 ## Show your support

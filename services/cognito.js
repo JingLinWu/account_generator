@@ -10,8 +10,10 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
 var secmail = require("../clients/secmail");
-var BaseServiceProvider  = require('./base-service-provider') 
+var BaseServiceProvider  = require('./base-service-provider');
+var {Logger} = require("../utils/logger");
 
+var logger = new Logger();
 
 
 class CognitoServiceProvider extends BaseServiceProvider{
@@ -114,16 +116,11 @@ function makeHttpPost(_url, _form, _headers) {
 	return new Promise((resolve, reject) => {
 		
 		request.post(options, function(err, res, body) {
-                	console.log('body:'+ body);
-               	 	console.log(err);
-                	console.log('res code:' + res.statusCode);
-                	console.log("req:" + JSON.stringify(request.headers));
+                	logger.debug("["+CognitoServiceProvider.name+"]>>>> makeHttpPost  <<<<< req:" + JSON.stringify(request.headers));
 
                 	if (res.statusCode == 302) {
 
-                        	console.log(JSON.stringify(res.headers));
-                        	console.log("headers="+res.headers);
-                        	//console.log(res.headers.location);
+                        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> makeHttpPost<<<<< header: "+ JSON.stringify(res.headers));
                 	}
 			if (err) reject(err);
 			if (res.statusCode == 200 || res.statusCode == 302)  {
@@ -149,15 +146,14 @@ function sleep(ms) {
 
 
 async function fillAccountInSignupPage( signUpUrl,  account, pass){
-	console.log('fillAccountInSignupPage');
+	logger.info('['+CognitoServiceProvider.name+'] >>>>> fillAccountInSignupPage <<<<<');
 	var signUpResult = { canSignUp:false, signUpRes:{}}
 	try {
         	var initHeaders = {}
         	const res  = await makeHttpRequest( signUpUrl, initHeaders)
         	const dom = new JSDOM(res);
         	const csrfEleValue = dom.window.document.getElementsByName("_csrf")[0].value;
-        	console.log( "<<fillAccountInSignupPage>> csrf:" + csrfEleValue);
-        	//console.log(res);
+        	logger.debug( ">>>>> fillAccountInSignupPage>  <<<<< csrf:" + csrfEleValue);
         	var xsrf_token = 'XSRF-TOKEN=' + csrfEleValue
 
         	//Post to create account
@@ -173,13 +169,12 @@ async function fillAccountInSignupPage( signUpUrl,  account, pass){
                          }
         	var resc = await makeHttpPost( signUpUrl, _form, _headers);
 		
-		console.log("Filling Post Result >>>>> :" + JSON.stringify( resc));
+		logger.debug("["+CognitoServiceProvider.name+"]>>>> fillAccountInSignupPage <<<<< Filling Post Result :" + JSON.stringify( resc));
 
 		if( resc.length > 2) {
 			if (resc[1].statusCode == 302) {
-                                console.log("<< fillingSignupPage>> :" +JSON.stringify(resc[1].headers));
-                                console.log("<<fillingSignupPage>>:"+ " headers= "+resc[1].headers);
-                                console.log("<<fillingSingupPage>> redirect location:" + resc[1].headers.location);
+                                logger.debug("["+CognitoServiceProvider.name+"]>>>>> fillingSignupPage <<<<< :" +JSON.stringify(resc[1].headers));
+                                logger.debug("["+CognitoServiceProvider.name+"]>>>>> fillingSingupPage <<<<< redirect location:" + resc[1].headers.location);
 				signUpResult.signUpRes = resc[1];
 				signUpResult.signUpRes.additional = {'csrf':csrfEleValue};
 				signUpResult.canSignUp = true;
@@ -187,11 +182,11 @@ async function fillAccountInSignupPage( signUpUrl,  account, pass){
                 	}
 		}	
 		//signUpResult.signUpRes = resc
-		console.log("FILLING >>>>>> :" + JSON.stringify(resc));
+		logger.debug("["+CognitoServiceProvider.name+"]>>>>> FILLING <<<<< :" + JSON.stringify(resc));
 		var redirectCfmPageUrl = resc[1].headers.location;
         	var cookies = resc[1].headers['set-cookie'];
 	} catch (error) {
-        	console.error('fillAccountInSignupPage >>> ERROR: '+error);
+        	logger.error("["+CognitoServiceProvider.name+"]>>>>> fillAccountInSignupPage <<<<< ERROR: "+error);
    	}	
 	return signUpResult;
 
@@ -200,12 +195,12 @@ async function fillAccountInSignupPage( signUpUrl,  account, pass){
 async function confirmVerification(session, verificationCode ){
 	
 	//Open confirm page by HttpGet
-      	console.log( ">>>>> confirmVerification <<<<<"); 
+      	logger.info("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<<"); 
 	try {
 		var redirectCfmPageUrl = session.headers.location;
         	var cookies = session.headers['set-cookie'];
-        	console.log('>>>>> confirmVerification <<<<< cookies:' + cookies);
-        	console.log('>>>>> confirmVerification <<<<< redirect page:' + redirectCfmPageUrl);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< cookies:" + cookies);
+        	logger.debug(">>>>> confirmVerification <<<<< redirect page:" + redirectCfmPageUrl);
 
         	var redirectHeaders = { 'cookie': cookies }
         	const confirmPageRec  = await makeHttpRequest( redirectCfmPageUrl, redirectHeaders)
@@ -223,13 +218,13 @@ async function confirmVerification(session, verificationCode ){
 		let xsrf_token = 'XSRF-TOKEN=' + csrf_;
 		let confirm = ''
 
-        	console.log("_csrf:"+csrf_);
-        	console.log("usernameEleValue:"+usernameEleValue);
-        	console.log("subEleValue:"+subEleValue);
-        	console.log("destinationEleValue:"+destinationEleValue);
-        	console.log("deliveryMediumEleValue:"+deliveryMediumEleValue);
-        	console.log("code:"+code);
-        	console.log("confirm:"+confirm);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< _csrf:"+csrf_);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< usernameEleValue:"+usernameEleValue);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< subEleValue:"+subEleValue);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< destinationEleValue:"+destinationEleValue);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< deliveryMediumEleValue:"+deliveryMediumEleValue);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< code:"+code);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< confirm:"+confirm);
 
 		var _verifyForm  = {
                 	 username: usernameEleValue,
@@ -247,130 +242,19 @@ async function confirmVerification(session, verificationCode ){
        		}
 
         	var verRes = await makeHttpPost( redirectCfmPageUrl, _verifyForm, _verifyHeaders);
-        	console.log(" last result page loc: " + verRes[1].headers.location);
+        	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< last result page loc: " + verRes[1].headers.location);
 		
 	}catch(error){
-		console.log("ERROR:" + error);
+		logger.error("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< ERROR:" + error);
 	}	
 
 }
 
 
-async function start() {
-    try {
-	var accountRes = await secmail.genValidAccount(5);
-        console.log("accountRes ==>"+ accountRes);
-	account = accountRes[0];
-        //var mes = getAccountMessage(String(res[0]));
-
-	var initHeaders = {}
-        const res  = await makeHttpRequest( signUpUrl, initHeaders)
-        const dom = new JSDOM(res);
-	const csrfEleValue = dom.window.document.getElementsByName("_csrf")[0].value;
-	console.log( "csrf:" + csrfEleValue);
-	//console.log(res);
-	var xsrf_token = 'XSRF-TOKEN=' + csrfEleValue
-	
-	
-	
-	let options = {
-    		url: signUpUrl,
-		headers: {
-        		'Content-Type': 'application/x-www-form-urlencoded',
-			'cookie': xsrf_token
-   		},
-    		form: {
-        		username: account,
-        		password: '4536@pSwD',
-			_csrf: csrfEleValue
-   			 }
-	};
-
-	//Post to create account
-	var _form = {
-                        username: account,
-                        password: '4536@pSwD',
-                        _csrf: csrfEleValue
-                         }
-	
-	var _headers = {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'cookie': xsrf_token
-               		 }
-	var resc = await makeHttpPost( signUpUrl, _form, _headers);
-	console.log("location =>" + resc[1].headers.location)
-
-	//Get account email message 
-	await sleep(5000);
-	var mes = await secmail.getMessageIdByAccount(account)
-	console.log("account msg:" + JSON.stringify(mes));
-	var messageId = mes[0].id;
-	console.log("message id: " + messageId);
-
-
-	//Read message of extrive verification code
-	var msgRes = await secmail.readEmailMessage(account, messageId)
-        console.log("msgRes:" + JSON.stringify(msgRes));
-	var codeStr = msgRes["body"];
-	var code = codeStr.split("Your confirmation code is");
-	var verificationCode = code[1].trim();
-	console.log("verification code:"+ verificationCode);
-
-	  //Open confirm page by HttpGet
-        var redirectCfmPageUrl = resc[1].headers.location;
-	var cookies = resc[1].headers['set-cookie'];
-	console.log('cookies:' + cookies);
-	console.log('redirect page:' + redirectCfmPageUrl);
-
-	var redirectHeaders = { 'cookie': cookies }
-        const confirmPageRec  = await makeHttpRequest( redirectCfmPageUrl, redirectHeaders)
-        const cfmDom = new JSDOM(confirmPageRec);
-        const usernameEleValue = cfmDom.window.document.getElementsByName("username")[0].value;
-        const subEleValue = cfmDom.window.document.getElementsByName("sub")[0].value;
-        const destinationEleValue = cfmDom.window.document.getElementsByName("destination")[0].value;
-        const deliveryMediumEleValue = cfmDom.window.document.getElementsByName("deliveryMedium")[0].value;
-        var code = verificationCode
-        var confirm = ''
-
-        console.log("_csrf:"+csrfEleValue);
-        console.log("usernameEleValue:"+usernameEleValue);
-        console.log("subEleValue:"+subEleValue);
-        console.log("destinationEleValue:"+destinationEleValue);
-        console.log("deliveryMediumEleValue:"+deliveryMediumEleValue);
-        console.log("code:"+code);
-        console.log("confirm:"+confirm);
-
-
-
-
-
-	var _verifyForm  = {
-		 username: usernameEleValue,
-                 _csrf: csrfEleValue,
-		destination: destinationEleValue,
-		deliveryMedium: deliveryMediumEleValue,
-		sub: subEleValue,
-		code: verificationCode,
-		confirm: '',
-	}
-	
-	var _verifyHeaders = {
-		'Content-Type': 'application/x-www-form-urlencoded',
-                'cookie': 'cognito-fl=\"10=\"; '+ xsrf_token,
-	}
-
-	var verRes = await makeHttpPost( redirectCfmPageUrl, _verifyForm, _verifyHeaders);	
-        console.log(" last result page loc: " + verRes[1].headers.location);	
-
-    } catch (error) {
-        console.error('ERROR:');
-        console.error(error);
-    }
-}
 
 
 function httpRequest(action, params){
-	console.log("action:"+ action +" , params:" + params);
+	logger.debug("["+CognitoServiceProvider.name+"]>>>>> httpRequest <<<<< action:"+ action +" , params:" + params);
 	var apiUrl = url;
 	switch(action){
 		case 'GenEmail':

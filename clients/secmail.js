@@ -34,7 +34,6 @@ class SecMail extends baseAccountProvider{
                                 logger.debug(">>>>> genValidAccount <<<<< :"+ getMessageParams);
                         }
 
-                logger.debug(res);
 
                 // try downloading an invalid url
                 } catch (error) {
@@ -47,19 +46,17 @@ class SecMail extends baseAccountProvider{
 	
 
 	async readVerificationCodeByAccount( _account ){
-		logger.info("<<< readVerificationCodeByAccount >>>");		
+		logger.info(" >>>>> readVerificationCodeByAccount <<<<<");		
 		await sleep(5000); 
 		var mes = await this.getAccountMessage(_account)
-        	logger.debug(">>>>> readVerificationCodeByAccount <<<< account msg:" + JSON.stringify(mes));
         	var messageId = mes[0].id;
-        	logger.debug(">>>>> readVerificationCodeByAccount <<<<< message id: " + messageId);
+        	logger.debug(" >>>>> readVerificationCodeByAccount <<<<< message id: " + messageId);
 
         	//Read message of extrive verification code
         	var msgRes = await this.readAccountMessageById(_account, messageId);
 		var codeStr = msgRes["body"];
         	var code = codeStr.split("Your confirmation code is");
         	var verificationCode = code[1].trim();		
-		logger.debug (">>>>> readVerificationCodeByAccount <<<<< verificationCode:" + verificationCode);
 		return verificationCode;		
 	}
 	
@@ -75,11 +72,10 @@ class SecMail extends baseAccountProvider{
                 	 }
                 	const res  = await makeHttpGetRequest(url + pathReadMessageContent , accountInfoById)
                 	obj  = JSON.parse(res);
-                	logger.debug(res);
 
         	// try downloading an invalid url
         	} catch (error) {
-                	logger.error(error);
+                	logger.error( error);
         	 }
         	return obj;
 
@@ -96,7 +92,6 @@ class SecMail extends baseAccountProvider{
        			 }
         		const res  = await makeHttpGetRequest(url+pathGetMessage, accountInfo)
         		result  = JSON.parse(res);
-        		logger.debug(">>>>>getAccountMessage <<<<< " + res);
 
     		} catch (error) {
         		logger.error(error);
