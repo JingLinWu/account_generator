@@ -1,6 +1,6 @@
 {
   "name": "magic_account",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Generate account and signup for specified services",
   "main": "index.js",
   "scripts": {
