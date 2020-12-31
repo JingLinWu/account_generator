@@ -175,9 +175,11 @@ async function fillAccountInSignupPage( signUpUrl,  account, pass){
 			if (resc[1].statusCode == 302) {
                                 logger.debug("["+CognitoServiceProvider.name+"]>>>>> fillingSignupPage <<<<< :" +JSON.stringify(resc[1].headers));
                                 logger.debug("["+CognitoServiceProvider.name+"]>>>>> fillingSingupPage <<<<< redirect location:" + resc[1].headers.location);
-				signUpResult.signUpRes = resc[1];
-				signUpResult.signUpRes.additional = {'csrf':csrfEleValue};
-				signUpResult.canSignUp = true;
+				if(resc[1].headers.location && resc[1].headers.location.includes("confirm")){
+					signUpResult.signUpRes = resc[1];
+                                	signUpResult.signUpRes.additional = {'csrf':csrfEleValue};
+                                	signUpResult.canSignUp = true;
+				}
 				
                 	}
 		}	
@@ -196,6 +198,7 @@ async function confirmVerification(session, verificationCode ){
 	
 	//Open confirm page by HttpGet
       	logger.info("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<<"); 
+	let verifyRes = { isAccountGenerated:false, account:'', service:"cognito"}; 
 	try {
 		var redirectCfmPageUrl = session.headers.location;
         	var cookies = session.headers['set-cookie'];
@@ -243,56 +246,19 @@ async function confirmVerification(session, verificationCode ){
 
         	var verRes = await makeHttpPost( redirectCfmPageUrl, _verifyForm, _verifyHeaders);
         	logger.debug("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< last result page loc: " + verRes[1].headers.location);
-		
+		if( verRes[1].statusCode == 302) {
+			//redirect to valid page
+			verifyRes.isAccountGenerated = true;
+			verifyRes.account  = usernameEleValue;
+		}
+	        	
 	}catch(error){
 		logger.error("["+CognitoServiceProvider.name+"]>>>>> confirmVerification <<<<< ERROR:" + error);
 	}	
-
+	return verifyRes;
 }
 
 
 
-
-function httpRequest(action, params){
-	logger.debug("["+CognitoServiceProvider.name+"]>>>>> httpRequest <<<<< action:"+ action +" , params:" + params);
-	var apiUrl = url;
-	switch(action){
-		case 'GenEmail':
-		apiUrl = apiUrl + pathGenMail + params
-		break;
-		case 'GetMsg':
-		breadk;
-		case 'ReadMsg':
-		break;
-
-	}
-	console.log('URL:' + apiUrl);
-/*
-	https.get(apiUrl, res => {
-  		let data = ""
-		res.on("data", d => {
-    			data += d
-  		})
-  		res.on("end", () => {
-    			console.log(data)
-  		})
-	})
-*/	
-
-/*
-	const response = await request(apiUrl);
-	request(apiUrl, function (error, response, body) {
-		
-		if (!error && response.statusCode == 200) {
-        		console.log(body)
-       		}
-		else{
-			console.log(error);
-		}
-	
-	})
-*/
-
-}
 
 module.exports = CognitoServiceProvider

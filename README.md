@@ -1,6 +1,6 @@
 <h1 align="center">Welcome to magic-account 👋</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.8-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.9-blue.svg?cacheSeconds=2592000" />
   <a href="#" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
@@ -12,6 +12,7 @@
 ## Usage
 
 ```sh
+
 var acc = require('magic_account');
 
 var SecMail = acc.SecMail
@@ -40,6 +41,14 @@ m.addAccountProvider(secmail);
 m.addServiceProvider(cognito);
 
 m.generateAccountInfo();
+
+```
+
+## Result Example
+
+```sh
+
+[{"service":"cognito","accountList":["j13fclw@1secmail.com","xhrh94@wwjmp.com","a986u66bk6@1secmail.org"]}]
 
 ```
 
